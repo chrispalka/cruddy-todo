@@ -61,7 +61,7 @@ describe('getNextUniqueId', () => {
 
 });
 
-describe('todos', () => {
+xdescribe('todos', () => {
   before(initializeTestFiles);
   beforeEach(initializeTestCounter);
   beforeEach(cleanTestDatastore);
@@ -106,7 +106,7 @@ describe('todos', () => {
     });
   });
 
-  describe('readAll', () => {
+  xdescribe('readAll', () => {
     it('should return an empty array when there are no todos', (done) => {
       todos.readAll((err, todoList) => {
         expect(err).to.be.null;
@@ -153,7 +153,7 @@ describe('todos', () => {
     });
   });
 
-  describe('update', () => {
+  xdescribe('update', () => {
     beforeEach((done) => {
       todos.create('original todo', done);
     });
@@ -187,7 +187,7 @@ describe('todos', () => {
     });
   });
 
-  describe('delete', () => {
+  xdescribe('delete', () => {
     beforeEach((done) => {
       todos.create('delete this todo', done);
     });
