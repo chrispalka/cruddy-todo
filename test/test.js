@@ -61,7 +61,7 @@ describe('getNextUniqueId', () => {
 
 });
 
-xdescribe('todos', () => {
+describe('todos', () => {
   before(initializeTestFiles);
   beforeEach(initializeTestCounter);
   beforeEach(cleanTestDatastore);
