@@ -26,11 +26,20 @@ exports.create = (text, callback) => {
 
 
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      throw('ERROR!');
+    } else {
+      console.log('files: ', files);
+      var data = _.map(files, (filename) => {
+        text = id = filename.slice(0, -4);
+        return { id, text };
+      });
+      callback(null, data);
+    }
   });
-  callback(null, data);
 };
+
 
 exports.readOne = (id, callback) => {
   var text = items[id];
