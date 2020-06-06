@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Promise = require('bluebird');
 const path = require('path');
 const sprintf = require('sprintf-js').sprintf;
 
@@ -46,6 +47,7 @@ exports.getNextUniqueId = (callback) => {
   });
 };
 
+exports.getNextUniqueIdAsync = Promise.promisify(exports.getNextUniqueId);
 
 
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////

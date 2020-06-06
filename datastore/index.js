@@ -8,19 +8,13 @@ Promise.promisifyAll(fs);
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
 exports.create = (text, callback) => {
-  var id = counter.getNextUniqueId((err, id) => {
-    if (err) {
-      callback(new Error('Error creating todo item'))
-    } else {
-      fs.writeFile(path.join(exports.dataDir, `${id}.txt`), text, (err) => {
-        if (err) {
-          callback(new Error('Error creating todo item'))
-        } else {
+  var id = counter.getNextUniqueIdAsync()
+    .then(function (id) {
+      fs.writeFileAsync(path.join(exports.dataDir, `${id}.txt`), text, 'utf8')
+        .then(function () {
           callback(null, { id, text });
-        }
-      });
-    }
-  });
+        });
+    }).catch(e => console.log('Error: ', e));
 };
 
 exports.readAll = (callback) => {
@@ -28,54 +22,36 @@ exports.readAll = (callback) => {
     .then(function (fileList) {
       var promises = [];
       _.each(fileList, (file) => {
-        promises.push(fs.readFileAsync(path.join(exports.dataDir, file), 'utf8').then(function(text) {
+        promises.push(fs.readFileAsync(path.join(exports.dataDir, file), 'utf8').then(function (text) {
           var id = file.slice(0, -4);
-          return {id: id, text: text}}))
-      })
+          return { id: id, text: text };
+        }));
+      });
       Promise.all(promises)
         .then(function (data) {
           callback(null, data);
         });
-    }).catch(e => console.log('Error: ', e))
+    }).catch(e => console.log('Error: ', e));
 };
 
-
 exports.readOne = (id, callback) => {
-  fs.readFile(path.join(exports.dataDir, `${id}.txt`), (err, data) => {
-    if (err) {
-      callback(new Error(`No item with id: ${id}`));
-    } else {
-      var text = data.toString();
-      callback(null, { id, text });
-    }
-  });
+  fs.readFileAsync(path.join(exports.dataDir, `${id}.txt`), 'utf8').then(function(text) {
+    callback(null, { id, text });
+  }).catch(e => callback(new Error(`No item with id: ${id}, Error: ${e}`)));
 };
 
 exports.update = (id, text, callback) => {
-  fs.readFile(path.join(exports.dataDir, `${id}.txt`), (err, data) => {
-    if (err) {
-      callback(new Error(`No item with id: ${id}`));
-    } else {
-      fs.writeFile(path.join(exports.dataDir, `${id}.txt`), text, (err) => {
-        if (err) {
-          throw ('ERROR!');
-        } else {
-          callback(null, { id, text });
-        }
-      });
-    }
-  });
+  fs.readFileAsync(path.join(exports.dataDir, `${id}.txt`), 'utf8').then(function() {
+    fs.writeFileAsync(path.join(exports.dataDir, `${id}.txt`), text, 'utf8').then(function() {
+      callback(null, { id, text });
+    });
+  }).catch(e => callback(new Error(`No item with id: ${id}, Error: ${e}`)));
 };
 
-
 exports.delete = (id, callback) => {
-  fs.unlink(path.join(exports.dataDir, `${id}.txt`), (err) => {
-    if (err) {
-      callback(new Error(`No item with id: ${id}`));
-    } else {
-      callback(null, id);
-    }
-  });
+  fs.unlinkAsync(path.join(exports.dataDir, `${id}.txt`)).then(function() {
+    callback(null, id);
+  }).catch(e => callback(new Error(`No item with id: ${id}`)));
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
