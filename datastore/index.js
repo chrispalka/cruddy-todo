@@ -28,8 +28,7 @@ exports.create = (text, callback) => {
   });
 };
 
-
-
+/**** What we had initially, using Promise.all ****
 exports.readAll = (callback) => {
 
   fs.readdirAsync(exports.dataDir)
@@ -48,81 +47,50 @@ exports.readAll = (callback) => {
 
     });
 };
-// exports.readAll = (callback) => {
-//   fs.readdir(exports.dataDir, (err, files) => {
-//     if (err) {
-//       throw ('ERROR!');
-//     } else {
-//       console.log('files: ', files);
-//       var data = _.map(files, (filename) => {
-//         text = id = filename.slice(0, -4);
-//         return { id, text };
-//       });
-//       callback(null, data);
-//     }
-//   });
-// };
-// console.log('PROMISES: ', promises);
-// Promise.all(promises).then(
+***************************************/
 
+// Using Promise.map
+exports.readAll = (callback) => {
+  fs.readdirAsync(exports.dataDir)
+    .then(function (fileList) {
+      console.log('filelist:', fileList);
+      var promises = [];
+      var data = Promise.map(fileList, function(files) {
+        var id = files.slice(0, -4);
+        console.log('ID!!!', id);
+        // [{ id: '00001', text: 'todo 1' }, { id: '00002', text: 'todo 2' }] <--- what current test is expecting, array of objects
+        return {'id': id, 'text': fs.readFileAsync(path.join(exports.dataDir, files), 'utf8')};
+      }).then(function(data) {
+        console.log('DATA!!!', data);
+        callback(null, data);
+      });
+    });
+};
 
-// const promise1 = Promise.resolve(3);
-// const promise2 = 42;
-// const promise3 = new Promise((resolve, reject) => {
-//   setTimeout(resolve, 100, 'foo');
-// });
-
-// Promise.all([promise1, promise2, promise3]).then((values) => {
-//   console.log(values);
-// });
-
-
-// fs.readdir(exports.dataDir, (err, files) => {
-//   if (err) {
-//     throw ('ERROR!');
-//   } else {
-//     console.log('files: ', files);
-//     var promises = []
-//     _.each(files, (filename) => {
-//       promises.push(fs.readFileAsync(filename, 'utf8'{
-
-//       })
-//       // return Promise.all(promies)
-//       // .then()
-
-
-//     // return Promise.all(files)
-//     // callback(null, data);
-//   })
-// })
-
-
-// Promise.all([
-//   asyncLib.getValueA(),fs.readfile(filelist[0])
-//   asyncLib.getValueB(),fs.readfile
-//   asyncLib.getValueC(),
-//   asyncLib.getValueD()
-// ])
-//   .then(asyncLib.logResolvedValues)
-//   .then(asyncLib.filterValuesFromCollection)
-//   .then(asyncLib.doMoreAsyncWorkWithFilteredValues)
-// // `bind` sets correct context when using console.log as a callback
-//   .catch(console.log.bind(console));
-
+/**** Original readAll without promises ****
+exports.readAll = (callback) => {
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      throw ('ERROR!');
+    } else {
+      console.log('files: ', files);
+      var data = _.map(files, (filename) => {
+        text = id = filename.slice(0, -4);
+        return { id, text };
+      });
+      callback(null, data);
+    }
+  });
+};
+***************************************/
 
 exports.readOne = (id, callback) => {
   fs.readFile(path.join(exports.dataDir, `${id}.txt`), (err, data) => {
     if (err) {
       callback(new Error(`No item with id: ${id}`));
     } else {
-      console.log('data: ', data.toString());
-      // var text = items[id];
       var text = data.toString();
-      // if (!text) {
-      //   callback(new Error(`No item with id: ${id}`));
-      // } else {
       callback(null, { id, text });
-      // }
     }
   });
 };
@@ -133,9 +101,7 @@ exports.update = (id, text, callback) => {
     if (err) {
       callback(new Error(`No item with id: ${id}`));
     } else {
-      console.log('data!!!', data.toString());
       item = text;
-      console.log('item!!!', item);
       fs.writeFile(path.join(exports.dataDir, `${id}.txt`), item, (err) => {
         if (err) {
           throw ('ERROR!');
