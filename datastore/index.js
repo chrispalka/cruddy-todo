@@ -69,6 +69,7 @@ exports.update = (id, text, callback) => {
   }
 };
 
+
 exports.delete = (id, callback) => {
   var item = items[id];
   delete items[id];
