@@ -1,10 +1,10 @@
 $(() => {
 
   // View ////////////////////////////////////////////////////////////////////////
-
   var template = _.template(`
     <li data-id="<%=id%>" class="todo">
       <span><%=text%></span>
+      <span><%=new Date()%></span>
       <button data-action="edit">edit</button>
       <button data-action="done">&#x2714;</button>
     </li>
@@ -14,8 +14,8 @@ $(() => {
     return template(todo);
   };
 
-  var addTodo = (todo) => {
-    $('#todos').append(renderTodo(todo));
+  var addTodo = (todo, date) => {
+    $('#todos').append(renderTodo(todo, date));
   };
 
   var changeTodo = (id, todo) => {
@@ -36,8 +36,9 @@ $(() => {
 
   $('#form button').click( (event) => {
     var text = $('#form input').val().trim();
+    var date = new Date();
     if (text) {
-      Todo.create(text, addTodo);
+      Todo.create(text, date, addTodo);
     }
     $('#form input').val('');
   });

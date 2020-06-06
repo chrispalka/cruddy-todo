@@ -11,7 +11,7 @@ window.Todo = {
       url: this.url,
       type: 'POST',
       dataType: 'json',
-      data: {todoText: text},
+      data: {todoText: text, date: 'todays date'},
       success: callback
     });
   },

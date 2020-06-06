@@ -7,12 +7,13 @@ Promise.promisifyAll(fs);
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
-exports.create = (text, callback) => {
+exports.create = (text, date, callback) => {
+  console.log(date);
   var id = counter.getNextUniqueIdAsync()
     .then(function (id) {
       fs.writeFileAsync(path.join(exports.dataDir, `${id}.txt`), text, 'utf8')
         .then(function () {
-          callback(null, { id, text });
+          callback(null, { id, text, date });
         });
     }).catch(e => console.log('Error: ', e));
 };
